@@ -1,0 +1,5 @@
+{
+  "gmail_query": "from:order@rakuten.co.jp subject:\"【楽天市場】注文内容ご確認（自動配信メール）\" newer_than:14d",
+  "processed_store": "data/processed_order_messages.json",
+  "line_message_prefix": "楽天 注文商品"
+}

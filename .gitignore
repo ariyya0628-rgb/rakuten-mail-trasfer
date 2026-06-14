@@ -1,0 +1,7 @@
+credentials/credentials.json
+credentials/token.json
+.venv/
+__pycache__/
+*.pyc
+.env
+data/processed_order_messages.json

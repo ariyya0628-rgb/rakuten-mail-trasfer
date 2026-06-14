@@ -1,0 +1,491 @@
+{
+  "labels": [
+    "楽天",
+    "楽天/お知らせ",
+    "楽天/注文",
+    "楽天/問い合わせ",
+    "楽天/購入者連絡",
+    "楽天/返品・キャンセル",
+    "楽天/重要",
+    "楽天/精算",
+    "楽天/迷惑回避"
+  ],
+  "obsolete_filters": [
+    {
+      "name": "削除: 旧info宛てラベル",
+      "criteria": {
+        "to": "info@trend-i-shop.com"
+      },
+      "action": {
+        "never_spam": true,
+        "add_label": "楽天/info"
+      }
+    },
+    {
+      "name": "削除: 旧問い合わせ広域ラベル",
+      "criteria": {
+        "query": "info@trend-i-shop.com 問い合わせ"
+      },
+      "action": {
+        "never_spam": true,
+        "add_label": "楽天/問い合わせ"
+      }
+    },
+    {
+      "name": "削除: 旧注文広域ラベル",
+      "criteria": {
+        "query": "info@trend-i-shop.com 注文"
+      },
+      "action": {
+        "never_spam": true,
+        "add_label": "楽天/注文"
+      }
+    },
+    {
+      "name": "削除: 旧返品キャンセル広域ラベル",
+      "criteria": {
+        "query": "info@trend-i-shop.com (返品 OR キャンセル)"
+      },
+      "action": {
+        "never_spam": true,
+        "add_label": "楽天/返品・キャンセル"
+      }
+    },
+    {
+      "name": "削除: 旧重要広域ラベル",
+      "criteria": {
+        "query": "info@trend-i-shop.com (至急 OR 重要 OR 返金 OR クレーム)"
+      },
+      "action": {
+        "never_spam": true,
+        "add_label": "楽天/重要"
+      }
+    },
+    {
+      "name": "削除: 旧キャンセル重要ラベル",
+      "criteria": {
+        "query": "info@trend-i-shop.com (至急 OR 重要 OR キャンセル OR 返金 OR クレーム)"
+      },
+      "action": {
+        "never_spam": true,
+        "add_label": "楽天/重要"
+      }
+    },
+    {
+      "name": "削除: 旧チャージバック重要ラベル",
+      "criteria": {
+        "query": "info@trend-i-shop.com チャージバック"
+      },
+      "action": {
+        "never_spam": true,
+        "add_label": "楽天/重要"
+      }
+    },
+    {
+      "name": "削除: 旧違反監視重要ラベル",
+      "criteria": {
+        "query": "from:mail-surveillance@mail.rakuten.com info@trend-i-shop.com"
+      },
+      "action": {
+        "never_spam": true,
+        "add_label": "楽天/重要"
+      }
+    },
+    {
+      "name": "削除: 旧迷惑回避ラベル",
+      "criteria": {
+        "query": "info@trend-i-shop.com"
+      },
+      "action": {
+        "never_spam": true,
+        "add_label": "楽天/迷惑回避"
+      }
+    },
+    {
+      "name": "削除: 旧楽天注文自動配信",
+      "criteria": {
+        "query": "from:order@rakuten.co.jp info@trend-i-shop.com"
+      },
+      "action": {
+        "never_spam": true,
+        "skip_inbox": true,
+        "add_label": "楽天/注文"
+      }
+    },
+    {
+      "name": "削除: 旧楽天支払い自動配信",
+      "criteria": {
+        "query": "from:order-confirm@order-rp.rms.rakuten.co.jp info@trend-i-shop.com"
+      },
+      "action": {
+        "never_spam": true,
+        "skip_inbox": true,
+        "add_label": "楽天/注文"
+      }
+    },
+    {
+      "name": "削除: 旧楽天注文内容確認",
+      "criteria": {
+        "query": "info@trend-i-shop.com subject:\"【楽天市場】注文内容ご確認（自動配信メール）\""
+      },
+      "action": {
+        "never_spam": true,
+        "skip_inbox": true,
+        "add_label": "楽天/注文"
+      }
+    }
+  ],
+  "filters": [
+    {
+      "name": "迷惑回避: info宛て全体",
+      "criteria": {
+        "query": "info@trend-i-shop.com"
+      },
+      "action": {
+        "never_spam": true
+      }
+    },
+    {
+      "name": "購入者連絡: 楽天転送アドレス",
+      "criteria": {
+        "query": "from:pc.fw.rakuten.ne.jp info@trend-i-shop.com"
+      },
+      "action": {
+        "never_spam": true,
+        "remove_labels": [
+          "楽天/お知らせ",
+          "楽天/注文",
+          "楽天/問い合わせ",
+          "楽天/返品・キャンセル",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/購入者連絡"
+      }
+    },
+    {
+      "name": "お知らせ: 楽天からのお知らせ",
+      "criteria": {
+        "query": "from:no-reply@info.rms.rakuten.co.jp info@trend-i-shop.com"
+      },
+      "action": {
+        "never_spam": true,
+        "remove_labels": [
+          "楽天/info",
+          "楽天/注文",
+          "楽天/問い合わせ",
+          "楽天/返品・キャンセル",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/お知らせ"
+      }
+    },
+    {
+      "name": "重要: チャージバック",
+      "criteria": {
+        "query": "info@trend-i-shop.com チャージバック"
+      },
+      "action": {
+        "never_spam": true,
+        "remove_labels": [
+          "楽天/info",
+          "楽天/注文",
+          "楽天/問い合わせ",
+          "楽天/返品・キャンセル",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/重要"
+      }
+    },
+    {
+      "name": "重要: 違反点数・監視",
+      "criteria": {
+        "query": "from:mail-surveillance@mail.rakuten.com info@trend-i-shop.com"
+      },
+      "action": {
+        "never_spam": true,
+        "remove_labels": [
+          "楽天/info",
+          "楽天/注文",
+          "楽天/問い合わせ",
+          "楽天/返品・キャンセル",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/重要"
+      }
+    },
+    {
+      "name": "重要: 至急・返金・クレーム",
+      "criteria": {
+        "query": "info@trend-i-shop.com (至急 OR 重要 OR 返金 OR クレーム)"
+      },
+      "action": {
+        "never_spam": true,
+        "remove_labels": [
+          "楽天/info",
+          "楽天/注文",
+          "楽天/問い合わせ",
+          "楽天/返品・キャンセル",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/重要"
+      }
+    },
+    {
+      "name": "精算: Rakuten BillPay",
+      "criteria": {
+        "query": "info@trend-i-shop.com (\"Rakuten BillPay\" OR 総合精算書 OR 支払通知書)"
+      },
+      "action": {
+        "never_spam": true,
+        "add_label": "楽天/精算"
+      }
+    },
+    {
+      "name": "注文: 楽天注文自動配信",
+      "criteria": {
+        "query": "from:order@rakuten.co.jp info@trend-i-shop.com"
+      },
+      "action": {
+        "never_spam": true,
+        "skip_inbox": true,
+        "remove_labels": [
+          "楽天/info",
+          "楽天/お知らせ",
+          "楽天/問い合わせ",
+          "楽天/返品・キャンセル",
+          "楽天/重要",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/注文"
+      }
+    },
+    {
+      "name": "注文: 楽天支払い自動配信",
+      "criteria": {
+        "query": "from:order-confirm@order-rp.rms.rakuten.co.jp info@trend-i-shop.com"
+      },
+      "action": {
+        "never_spam": true,
+        "skip_inbox": true,
+        "remove_labels": [
+          "楽天/info",
+          "楽天/お知らせ",
+          "楽天/問い合わせ",
+          "楽天/返品・キャンセル",
+          "楽天/重要",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/注文"
+      }
+    },
+    {
+      "name": "注文: 注文確定のお知らせ",
+      "criteria": {
+        "query": "from:order-confirm@order-rp.rms.rakuten.co.jp subject:\"【楽天市場】注文確定のお知らせ\""
+      },
+      "action": {
+        "never_spam": true,
+        "skip_inbox": true,
+        "remove_labels": [
+          "楽天/info",
+          "楽天/お知らせ",
+          "楽天/問い合わせ",
+          "楽天/返品・キャンセル",
+          "楽天/重要",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/注文"
+      }
+    },
+    {
+      "name": "注文: 支払い確認済み",
+      "criteria": {
+        "query": "from:order-confirm@order-rp.rms.rakuten.co.jp subject:\"【楽天市場】お支払いが確認できました（自動配信メール）\""
+      },
+      "action": {
+        "never_spam": true,
+        "skip_inbox": true,
+        "remove_labels": [
+          "楽天/info",
+          "楽天/お知らせ",
+          "楽天/問い合わせ",
+          "楽天/返品・キャンセル",
+          "楽天/重要",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/注文"
+      }
+    },
+    {
+      "name": "注文: 注文内容確認",
+      "criteria": {
+        "query": "info@trend-i-shop.com subject:\"【楽天市場】注文内容ご確認（自動配信メール）\""
+      },
+      "action": {
+        "never_spam": true,
+        "skip_inbox": true,
+        "remove_labels": [
+          "楽天/info",
+          "楽天/お知らせ",
+          "楽天/問い合わせ",
+          "楽天/返品・キャンセル",
+          "楽天/重要",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/注文"
+      }
+    },
+    {
+      "name": "注文: お支払い手続き案内",
+      "criteria": {
+        "query": "info@trend-i-shop.com subject:\"【楽天市場】お支払い手続きのご案内（自動配信メール）\""
+      },
+      "action": {
+        "never_spam": true,
+        "skip_inbox": true,
+        "remove_labels": [
+          "楽天/info",
+          "楽天/お知らせ",
+          "楽天/問い合わせ",
+          "楽天/返品・キャンセル",
+          "楽天/重要",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/注文"
+      }
+    },
+    {
+      "name": "注文: 発送手続き完了",
+      "criteria": {
+        "subject": "【Trend Item Shop】商品発送の手続き完了のご連絡"
+      },
+      "action": {
+        "never_spam": true,
+        "skip_inbox": true,
+        "remove_labels": [
+          "楽天/info",
+          "楽天/お知らせ",
+          "楽天/問い合わせ",
+          "楽天/返品・キャンセル",
+          "楽天/重要",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/注文"
+      }
+    },
+    {
+      "name": "注文: 注文承諾メール",
+      "criteria": {
+        "subject": "【Trend Item Shop】ご注文ありがとうございます！（注文承諾メール ）"
+      },
+      "action": {
+        "never_spam": true,
+        "skip_inbox": true,
+        "remove_labels": [
+          "楽天/info",
+          "楽天/お知らせ",
+          "楽天/問い合わせ",
+          "楽天/返品・キャンセル",
+          "楽天/重要",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/注文"
+      }
+    },
+    {
+      "name": "問い合わせ: 返信自動配信",
+      "criteria": {
+        "query": "info@trend-i-shop.com お客様に返信しました 自動配信"
+      },
+      "action": {
+        "never_spam": true,
+        "skip_inbox": true,
+        "remove_labels": [
+          "楽天/info",
+          "楽天/お知らせ",
+          "楽天/注文",
+          "楽天/返品・キャンセル",
+          "楽天/重要",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/問い合わせ"
+      }
+    },
+    {
+      "name": "問い合わせ: 商品問い合わせ確認",
+      "criteria": {
+        "query": "info@trend-i-shop.com subject:\"【楽天市場】商品問い合わせ内容ご確認（自動配信メール）\""
+      },
+      "action": {
+        "never_spam": true,
+        "skip_inbox": true,
+        "remove_labels": [
+          "楽天/info",
+          "楽天/お知らせ",
+          "楽天/注文",
+          "楽天/返品・キャンセル",
+          "楽天/重要",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/問い合わせ"
+      }
+    },
+    {
+      "name": "問い合わせ: 問い合わせ受付",
+      "criteria": {
+        "query": "info@trend-i-shop.com お客様への問い合わせを受け付けました 自動配信"
+      },
+      "action": {
+        "never_spam": true,
+        "skip_inbox": true,
+        "remove_labels": [
+          "楽天/info",
+          "楽天/お知らせ",
+          "楽天/注文",
+          "楽天/返品・キャンセル",
+          "楽天/重要",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/問い合わせ"
+      }
+    },
+    {
+      "name": "返品キャンセル: 注文キャンセル自動配信",
+      "criteria": {
+        "query": "info@trend-i-shop.com subject:\"【楽天市場】ご注文がキャンセルされました（自動配信メール）\""
+      },
+      "action": {
+        "never_spam": true,
+        "skip_inbox": true,
+        "remove_labels": [
+          "楽天/info",
+          "楽天/お知らせ",
+          "楽天/注文",
+          "楽天/問い合わせ",
+          "楽天/重要",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/返品・キャンセル"
+      }
+    },
+    {
+      "name": "返品キャンセル: 発送待ち取下げ",
+      "criteria": {
+        "query": "info@trend-i-shop.com subject:\"【楽天市場】発送待ち取下げのお知らせ\""
+      },
+      "action": {
+        "never_spam": true,
+        "skip_inbox": true,
+        "remove_labels": [
+          "楽天/info",
+          "楽天/お知らせ",
+          "楽天/注文",
+          "楽天/問い合わせ",
+          "楽天/重要",
+          "楽天/迷惑回避"
+        ],
+        "add_label": "楽天/返品・キャンセル"
+      }
+    }
+  ]
+}
