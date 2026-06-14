@@ -1,47 +1,66 @@
-# 楽天メール Gmailフィルタ自動作成ツール
+# 楽天メール Gmailフィルタ・注文通知ツール
 
-`info@trend-i-shop.com` に届く楽天関連メールを Gmail API で整理するツールです。
+お名前.comの `info@trend-i-shop.com` 宛メールをGmailで整理し、楽天の注文メールから商品名・価格だけを取り出して通知するためのプロジェクトです。
 
 主な機能は次の2つです。
 
-- Gmail ラベルとフィルタを自動作成する
-- 楽天の注文内容確認メールから「商品名・SKU・サイズ・価格」だけを抜き出して LINE に通知する
+- GmailラベルとGmailフィルタを自動作成する
+- 楽天の注文内容確認メールから、商品名・SKU・サイズ・価格を取り出してDiscordへ通知する
 
-PCを起動しっぱなしにせずLINE通知したい場合は、`apps_script/` の Google Apps Script 版を使います。設定手順は `apps_script/README.md` にまとめています。
+## 現在の運用
 
-## Gmailで作成するラベル
+通常運用はGoogle Apps Script版を使います。
 
-- 楽天
-- 楽天/お知らせ
-- 楽天/注文
-- 楽天/問い合わせ
-- 楽天/購入者連絡
-- 楽天/返品・キャンセル
-- 楽天/重要
-- 楽天/精算
-- 楽天/迷惑回避
+- PCを起動し続けなくてよい
+- Gmailに新しい注文メールが届くと、数分おきに自動確認する
+- すでに通知済みの注文は再通知しない
+- Discord Webhookへ通知する
 
-## Google Cloud 側の準備
+Python版はローカル確認やGmailフィルタ作成用です。
 
-1. [Google Cloud Console](https://console.cloud.google.com/) を開く
-2. プロジェクトを作成する
-3. Gmail API を有効化する
-4. OAuth 同意画面を設定する
-5. OAuth クライアント ID を作成する
-6. アプリケーションの種類は「デスクトップアプリ」を選ぶ
-7. JSON をダウンロードする
-8. `credentials/credentials.json` として保存する
-9. 初回実行時にブラウザで Google アカウント認証を行う
+## 管理しない秘密ファイル
 
-必要な Gmail API スコープ:
+次のファイルはGitHubに保存しません。
 
-- `https://www.googleapis.com/auth/gmail.settings.basic`
-- `https://www.googleapis.com/auth/gmail.labels`
-- `https://www.googleapis.com/auth/gmail.readonly`
+- `credentials/credentials.json`
+- `credentials/token.json`
+- `.env`
+- `.venv/`
+- `__pycache__/`
+- `*.pyc`
+- `data/processed_order_messages.json`
 
-`gmail.readonly` は、注文メール本文から商品情報を読むために使います。
+別PCで使う場合、これらは必要に応じて作り直すか、各サービスから再取得します。
+
+## フォルダ構成
+
+```text
+楽天メール/
+├─ README.md
+├─ requirements.txt
+├─ .gitignore
+├─ apps_script/
+│  ├─ Code_Discord.gs
+│  └─ README_Discord.md
+├─ config/
+│  ├─ filters.json
+│  └─ line_notifications.json
+├─ credentials/
+│  └─ .gitkeep
+├─ data/
+│  └─ .gitkeep
+└─ src/
+   ├─ main.py
+   ├─ gmail_client.py
+   ├─ labels.py
+   ├─ filters.py
+   ├─ order_parser.py
+   └─ order_line_notifier.py
+```
 
 ## 初回セットアップ
+
+PowerShellで実行します。
 
 ```powershell
 cd C:\Users\allja\Desktop\codex-project\楽天メール
@@ -49,115 +68,164 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-PowerShell で `.venv\Scripts\activate` が止められる場合でも、上のように `.\.venv\Scripts\python.exe` を直接使えば動きます。
+PowerShellで `.venv\Scripts\activate` が止められる場合は、無理に有効化せず、次のように直接Pythonを実行してください。
 
-## Gmailフィルタを作成する
+```powershell
+.\.venv\Scripts\python.exe src\main.py
+```
+
+## Google Cloud側の設定
+
+1. Google Cloud Consoleを開く
+2. プロジェクトを作成する
+3. Gmail APIを有効化する
+4. OAuth同意画面を設定する
+5. OAuthクライアントIDを作成する
+6. アプリケーションの種類は「デスクトップアプリ」を選ぶ
+7. JSONをダウンロードする
+8. `credentials/credentials.json` として保存する
+9. 初回実行時にブラウザでGoogleアカウント認証を行う
+
+必要なGmail APIスコープ:
+
+- `https://www.googleapis.com/auth/gmail.settings.basic`
+- `https://www.googleapis.com/auth/gmail.labels`
+- `https://www.googleapis.com/auth/gmail.readonly`
+
+`gmail.readonly` は、注文メール本文から商品情報を読むために使います。
+
+## Gmailフィルタ作成
+
+次のコマンドで、Gmailラベルとフィルタを作成します。
 
 ```powershell
 cd C:\Users\allja\Desktop\codex-project\楽天メール
 .\.venv\Scripts\python.exe src\main.py
 ```
 
-実行結果の例:
-
-```text
-[OK] ラベル作成: 楽天/注文
-[SKIP] ラベル既存: 楽天/重要
-[OK] フィルタ作成: from:order@rakuten.co.jp info@trend-i-shop.com
-[SKIP] フィルタ既存: info@trend-i-shop.com チャージバック
-```
-
-## LINE通知で送る内容
-
-対象メール:
-
-- 差出人: `order@rakuten.co.jp`
-- 件名: `【楽天市場】注文内容ご確認（自動配信メール）`
-
-LINE に送る内容:
-
-```text
-楽天 注文商品
-受注番号: 402853-20260612-0220534167
-日時: 2026-06-12 08:55:46
-
-1. アイリスオーヤマ 4K放送対応ハードディスク 2TB HDCZ-UT2K-IR ブラック(b09h35d7h4)
-SKU管理番号:01
-サイズ:2TB
-価格 21,560(円) x 1(個) = 21,560(円) ※10%税込
-```
-
-## LINE通知の準備
-
-LINE Notify は 2025年3月31日で終了しているため、このツールは LINE Messaging API のプッシュ通知を使います。
-
-必要なもの:
-
-- LINE Messaging API のチャネルアクセストークン
-- 通知を受ける LINE アカウントが、この公式アカウントを友だち追加していること
-
-LINE Official Account Manager では、右上の「設定」から「Messaging API」を開き、Messaging API を有効化します。その後、LINE Developers 側でチャネルアクセストークンを発行します。
-
-友だちが1人だけなら、`LINE_USER_ID` は不要です。このツールはユーザーIDが未設定の場合、公式アカウントの友だち全員へ通知します。
-
-環境変数に設定します。
-
-```powershell
-$env:LINE_CHANNEL_ACCESS_TOKEN="ここにチャネルアクセストークン"
-```
-
-または、プロジェクト直下に `.env` を作って保存できます。
-
-```text
-LINE_CHANNEL_ACCESS_TOKEN=ここにチャネルアクセストークン
-```
-
-特定の1人だけに送りたい場合は、追加で `LINE_USER_ID` も設定できます。
-
-`.env` は Git 管理されないようにしています。
-
-## LINE通知をテストする
-
-まずは LINE に送らず、画面表示だけで確認します。
-
-```powershell
-cd C:\Users\allja\Desktop\codex-project\楽天メール
-.\.venv\Scripts\python.exe src\order_line_notifier.py --dry-run
-```
-
-問題なければ LINE に送信します。
-
-```powershell
-.\.venv\Scripts\python.exe src\order_line_notifier.py
-```
-
-一度通知したメールIDは `data/processed_order_messages.json` に保存し、同じ注文メールを何度も通知しないようにします。
-
-## 認証をやり直す場合
-
-スコープを追加したため、古い `token.json` では再認証が必要になることがあります。その場合は次を実行してから、もう一度起動してください。
+`credentials/token.json` は初回認証後に自動保存されます。認証エラーが出た場合は、古い `credentials/token.json` を削除して再認証します。
 
 ```powershell
 Remove-Item .\credentials\token.json -ErrorAction SilentlyContinue
-.\.venv\Scripts\python.exe src\order_line_notifier.py --dry-run
+.\.venv\Scripts\python.exe src\main.py
 ```
 
-## 自動実行する場合
+## Discord通知の設定
 
-Windows のタスクスケジューラで、数分おきに次のコマンドを実行する設定にします。
+通常運用は `apps_script/Code_Discord.gs` をGoogle Apps Scriptに貼り付けて使います。
+
+1. sdonowsen側のGoogleアカウントでApps Scriptを開く
+2. `apps_script/Code_Discord.gs` の内容をコード欄へ貼り付ける
+3. 保存する
+4. Apps Scriptの「プロジェクトの設定」を開く
+5. スクリプトプロパティに次を追加する
+
+```text
+DISCORD_WEBHOOK_URL
+```
+
+値にはDiscordのWebhook URLを入れます。Webhook URLは秘密情報なので、GitHubには保存しません。
+
+### Discord Webhookの作り方
+
+1. Discordで通知したいサーバーとチャンネルを開く
+2. チャンネル設定を開く
+3. 「連携サービス」または「Integrations」を開く
+4. Webhookを作成する
+5. Webhook URLをコピーする
+
+### Apps Scriptで実行する関数
+
+接続テスト:
+
+```text
+testDiscordWebhookOnly
+```
+
+Gmail検索の確認:
+
+```text
+debugRecentRakutenOrders
+```
+
+今後の自動通知を開始:
+
+```text
+setupDiscordTrigger
+```
+
+自動通知を止める:
+
+```text
+deleteDiscordTriggers
+```
+
+過去3日分を今回だけ送る:
+
+```text
+sendLast3DaysUnnotifiedToDiscord
+```
+
+通常運用では `sendLast3DaysUnnotifiedToDiscord` は使いません。新着だけを送るには `setupDiscordTrigger` を1回実行すれば十分です。
+
+## 別PCから使う場合
+
+別PCでは、GitHubからプロジェクトを取得してから、秘密ファイルと認証を作り直します。
 
 ```powershell
-C:\Users\allja\Desktop\codex-project\楽天メール\.venv\Scripts\python.exe C:\Users\allja\Desktop\codex-project\楽天メール\src\order_line_notifier.py
+cd C:\Users\allja\Desktop\codex-project
+git clone https://github.com/ariyya0628-rgb/rakuten-mail-trasfer.git 楽天メール
+cd 楽天メール
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-## Git管理しないファイル
+別PCで必要な作業:
 
-次のファイルは `.gitignore` に入れています。
+- `credentials/credentials.json` をGoogle Cloudから再取得して配置する
+- 初回実行でGoogle認証を行い、`credentials/token.json` を作成する
+- Apps Script側のスクリプトプロパティ `DISCORD_WEBHOOK_URL` を再設定する
+- Apps ScriptのトリガーはPCではなくGoogle側で動くため、基本的には別PCで常時起動する必要はない
 
-- `credentials/credentials.json`
-- `credentials/token.json`
-- `.venv/`
-- `__pycache__/`
-- `*.pyc`
-- `.env`
-- `data/processed_order_messages.json`
+注意点:
+
+- `credentials/token.json` はPCごとの認証情報なので、GitHubには置かない
+- `.env` やWebhook URLはGitHubに置かない
+- Apps Scriptのコードを更新した場合は、GitHubのコードだけでなくApps Script画面にも貼り直す
+- 複数のGoogleアカウントを使う場合は、必ず注文メールが届くアカウント側のApps Scriptで設定する
+
+## GitHubへ保存する手順
+
+変更をGitHubへ保存する場合:
+
+```powershell
+cd C:\Users\allja\Desktop\codex-project\楽天メール
+git status --short --branch
+git add .
+git commit -m "Update documentation"
+git push
+```
+
+初回だけ送信先が未設定の場合:
+
+```powershell
+git remote add origin https://github.com/ariyya0628-rgb/rakuten-mail-trasfer.git
+git push -u origin master
+```
+
+`dubious ownership` が出た場合:
+
+```powershell
+git config --global --add safe.directory "C:/Users/allja/Desktop/codex-project/楽天メール"
+```
+
+## GitHubから最新版を取り込む手順
+
+別PCや別環境でGitHub上の最新版を取り込む場合:
+
+```powershell
+cd C:\Users\allja\Desktop\codex-project\楽天メール
+git pull
+```
+
+ローカルで未保存の変更がある場合は、先に `git status --short --branch` で確認してください。
