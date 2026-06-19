@@ -114,6 +114,8 @@ Remove-Item .\credentials\token.json -ErrorAction SilentlyContinue
 
 通常運用は `apps_script/Code_Discord.gs` をGoogle Apps Scriptに貼り付けて使います。
 
+Discordへ通知する内容は、スマホのプッシュ通知で見やすいように商品名と金額だけにしています。注文番号や日時は通知本文には出しません。
+
 1. sdonowsen側のGoogleアカウントでApps Scriptを開く
 2. `apps_script/Code_Discord.gs` の内容をコード欄へ貼り付ける
 3. 保存する

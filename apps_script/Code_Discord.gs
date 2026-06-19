@@ -407,24 +407,14 @@ function parseProducts_(productBlock) {
 }
 
 function formatDiscordMessage_(order) {
-  const lines = ['**' + CONFIG.messagePrefix + '**'];
-
-  if (order.orderNumber) {
-    lines.push('\u53d7\u6ce8\u756a\u53f7: ' + order.orderNumber);
-  }
-  if (order.orderedAt) {
-    lines.push('\u65e5\u6642: ' + order.orderedAt);
-  }
+  const lines = [];
 
   order.products.forEach(function (product, index) {
-    lines.push('');
-    lines.push((index + 1) + '. ' + product.name);
-    product.options.forEach(function (option) {
-      lines.push(option);
-    });
-    if (product.price) {
-      lines.push(product.price);
+    if (index > 0) {
+      lines.push('');
     }
+    lines.push(product.name);
+    lines.push('\u91d1\u984d: ' + summarizePrice_(product.price));
   });
 
   return lines.join('\n');
@@ -432,11 +422,9 @@ function formatDiscordMessage_(order) {
 
 function formatDiscordDigestLine_(order, index) {
   const product = order.products[0];
-  const productName = shortenText_(product.name, 44);
+  const productName = shortenText_(product.name, 64);
   const price = summarizePrice_(product.price);
-  const orderedAt = shortenOrderedAt_(order.orderedAt);
-  const orderNumber = order.orderNumber || '\u53d7\u6ce8\u756a\u53f7\u306a\u3057';
-  return index + '. ' + orderedAt + ' / ' + orderNumber + ' / ' + productName + ' / ' + price;
+  return index + '. ' + productName + ' / ' + price;
 }
 
 function shortenOrderedAt_(orderedAt) {
